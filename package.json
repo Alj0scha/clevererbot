@@ -10,6 +10,8 @@
     "astro": "astro"
   },
   "dependencies": {
-    "astro": "^4.16.7"
+    "astro": "^4.16.7",
+    "chatgpt": "^5.2.5",
+    "dotenv": "^16.4.5"
   }
 }
