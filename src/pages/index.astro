@@ -8,62 +8,124 @@ import { ChatGPTAPI } from 'chatgpt'
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 		<meta name="viewport" content="width=device-width" />
 		<meta name="generator" content={Astro.generator} />
-		<title>Astro</title>
+		<title>Clevererbot</title>
+
+		<style>
+			body {
+				font-family: Arial, sans-serif;
+				background-color: #f4f4f9;
+				margin: 0;
+				padding: 20px;
+				
+
+				.chat-container {
+					max-width: 600px;
+					margin: 0 auto;
+					background-color: white;
+					padding: 20px;
+					border-radius: 10px;
+					box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+				}
+				.message {
+					display: block;
+					max-width: 80%;
+					padding: 10px;
+					border-radius: 15px;
+					margin-bottom: 10px;
+					line-height: 1.4;
+				}
+				.my-message {
+					background-color: #007bff;
+					color: white;
+					text-align: right;
+					margin-left: auto;
+				}
+				.their-message {
+					background-color: #d3d3d3;
+					color: black;
+					text-align: left;
+					margin-right: auto;
+				}
+			    .logo {
+					display: grid;
+					width: 100%;
+					place-items: center;
+
+					img {
+						border-radius: 10px;
+					}
+				}
+				#form {
+					margin-block: 1rem;
+				}
+		}
+		</style>
+
+
 		<script>
 			const form = document.querySelector('#form')
 			form.addEventListener('submit', processInput)
 
+			let parentId;
+
 			async function processInput(event) {
 				event.preventDefault(); // Verhindert das Neuladen der Seite
 				const input = document.getElementById('inputField').value;
-				const outputDiv = document.getElementById('output');
 				
-				// Hier kannst du eine Logik einfügen, um auf den Input zu antworten
-				// Für dieses Beispiel gibt es einfach eine Antwort zurück
+				// Frage speichern
+				const historyDiv = document.getElementById('historyList');
+				let div = document.createElement('div');
+				div.classList.add('message', 'my-message');
+				div.innerText = input;
+				historyDiv.appendChild(div);
+				
+
+				// Antwort von chatGPT holen
 				const response = await fetch('/chatgpt', {
 					method: 'POST',
-					body: input,
-				}).then(res => res.text())
+					body: JSON.stringify({ prompt: input, id: parentId }),
+				}).then(res => res.json())
 
-				outputDiv.innerText = response;
+				parentId = response.id;
 				
-				saveToHistory(input, response.answer);
+				// Antwort speichern
+				div = document.createElement('div');
+				div.classList.add('message', 'their-message');
+				div.innerText = response.text;
+				historyDiv.appendChild(div);
 
 				// Leert das Eingabefeld
 				document.getElementById('inputField').value = '';
 
-				function saveToHistory(input, response) {
-            const history = JSON.parse(localStorage.getItem('chatHistory')) || [];
-            history.push({ input, response });
-            localStorage.setItem('chatHistory', JSON.stringify(history));
-            updateHistoryList();
-
-			function updateHistoryList() {
-            const history = JSON.parse(localStorage.getItem('chatHistory')) || [];
-            const historyDiv = document.getElementById('historyList');
-            historyDiv.innerHTML = ''; // Leert die Liste
-            history.forEach(item => {
-                const li = document.createElement('li');
-                li.textContent = `Eingabe: "${item.input}" - Antwort: "${item.response}"`;
-                historyDiv.appendChild(li);
-            });
-        }
-
-        }
+	
 			}
 		</script>
 		
 	</head>
 	<body>
+	<div class="logo">
 		<img src="/logo.png" alt="" srcset="">
 		<form id="form">
 			<label for="inputField">Gib etwas ein:</label>
 			<input type="text" id="inputField" name="inputField" required>
 			<input type="submit" value="Antwort erhalten">
 		</form>
-		
-		<div id="output"></div>
+	</div>
+		<div id="historyList">
+			<!-- <div class="message my-message">
+			</div>
+			<div class="message their-message">
+				I'm good, thanks! How about you?
+			</div>
+			<div class="message my-message">
+				I'm doing well. Working on some new projects.
+			</div>
+			<div class="message their-message">
+				That sounds exciting! Tell me more.
+			</div> -->
+		</div>
+	
 
-		
+
 	</body>
 </html>

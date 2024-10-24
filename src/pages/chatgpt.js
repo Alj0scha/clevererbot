@@ -5,11 +5,13 @@ const api = new ChatGPTAPI({
 })
 
 export async function POST({ request }) {
-    const prompt = await request.text()
+    const { id, prompt } = await request.json()
     console.log({ prompt })
 
     // Do things
-    const response = await api.sendMessage(prompt)
+    const response = await api.sendMessage(prompt, {
+        parentMessageId: id,
+    })
 
-    return new Response(response.text)
+    return new Response(JSON.stringify({ text: response.text, id: response.id }))
 }
