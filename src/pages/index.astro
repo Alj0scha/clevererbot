@@ -1,5 +1,6 @@
 ---
-import { ChatGPTAPI } from 'chatgpt'
+import { ChatGPTAPI } from "chatgpt";
+import Footer from "../pages/footer.astro";
 ---
 
 <html lang="en">
@@ -16,7 +17,6 @@ import { ChatGPTAPI } from 'chatgpt'
 				background-color: #f4f4f9;
 				margin: 0;
 				padding: 20px;
-				
 
 				.chat-container {
 					max-width: 600px;
@@ -46,9 +46,8 @@ import { ChatGPTAPI } from 'chatgpt'
 					text-align: left;
 					margin-right: auto;
 				}
-			    .logo {
+				.logo {
 					display: grid;
-					width: 100%;
 					place-items: center;
 
 					img {
@@ -58,74 +57,93 @@ import { ChatGPTAPI } from 'chatgpt'
 				#form {
 					margin-block: 1rem;
 				}
-		}
+			}
+
+			.container {
+				display: grid;
+				grid-template-columns: 20% auto 20%;
+				grid-template-rows: [row1-start] auto [row1-end] auto [third-line] auto [last-line];
+			}
+
+			.logo {
+				grid-column-start: 2;
+				grid-column-end: 3;
+				grid-row-start: row1-start;
+				grid-row-end: row1-end;
+			}
+
+			.input {
+				justify-self: center;
+				align-self: end;
+				grid-column-start: 2;
+				grid-column-end: 3;
+				grid-row-start: third-line;
+				grid-row-end: last-line;
+			}
+
+			.message-history {
+				grid-column-start: 2;
+				grid-column-end: 3;
+				grid-row-start: row1-end;
+				grid-row-end: third-line;
+			}
 		</style>
 
-
 		<script>
-			const form = document.querySelector('#form')
-			form.addEventListener('submit', processInput)
+			const form = document.querySelector("#form");
+			form.addEventListener("submit", processInput);
 
 			let parentId;
 
 			async function processInput(event) {
 				event.preventDefault(); // Verhindert das Neuladen der Seite
-				const input = document.getElementById('inputField').value;
-				
+				const input = document.getElementById("inputField").value;
+
 				// Frage speichern
-				const historyDiv = document.getElementById('historyList');
-				let div = document.createElement('div');
-				div.classList.add('message', 'my-message');
+				const historyDiv = document.getElementById("historyList");
+				let div = document.createElement("div");
+				div.classList.add("message", "my-message");
 				div.innerText = input;
 				historyDiv.appendChild(div);
-				
 
 				// Antwort von chatGPT holen
-				const response = await fetch('/chatgpt', {
-					method: 'POST',
+				const response = await fetch("/chatgpt", {
+					method: "POST",
 					body: JSON.stringify({ prompt: input, id: parentId }),
-				}).then(res => res.json())
+				}).then((res) => res.json());
 
 				parentId = response.id;
-				
+
 				// Antwort speichern
-				div = document.createElement('div');
-				div.classList.add('message', 'their-message');
+				div = document.createElement("div");
+				div.classList.add("message", "their-message");
 				div.innerText = response.text;
 				historyDiv.appendChild(div);
 
 				// Leert das Eingabefeld
-				document.getElementById('inputField').value = '';
-
-	
+				document.getElementById("inputField").value = "";
 			}
 		</script>
-		
 	</head>
 	<body>
-	<div class="logo">
-		<img src="/logo.png" alt="" srcset="">
-		<form id="form">
-			<label for="inputField">Gib etwas ein:</label>
-			<input type="text" id="inputField" name="inputField" required>
-			<input type="submit" value="Antwort erhalten">
-		</form>
-	</div>
-		<div id="historyList">
-			<!-- <div class="message my-message">
+		<div class="container">
+			<div class="logo">
+				<img src="/logo.png" alt="" srcset="" />
 			</div>
-			<div class="message their-message">
-				I'm good, thanks! How about you?
+			<div class="message-history" id="historyList"></div>
+			<div class="input">
+				<form id="form">
+					<label for="inputField">Gib etwas ein:</label>
+					<input
+						type="text"
+						id="inputField"
+						name="inputField"
+						required
+					/>
+					<input type="submit" value="Antwort erhalten" />
+				</form>
 			</div>
-			<div class="message my-message">
-				I'm doing well. Working on some new projects.
-			</div>
-			<div class="message their-message">
-				That sounds exciting! Tell me more.
-			</div> -->
+
 		</div>
-	
-
-
 	</body>
 </html>
